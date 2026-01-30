@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import type { Recipe, RecipeSource } from '../types/recipe'
-import { getRecipe, addRecipe, updateRecipe } from '../lib/storage'
+import { useData } from '../contexts/DataContext'
 import { autoCategorize } from '../lib/categories'
 
 const SOURCES: { value: RecipeSource; label: string }[] = [
@@ -30,6 +30,7 @@ const emptyRecipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'> = {
 export default function AddRecipe() {
   const [params] = useSearchParams()
   const editId = params.get('edit')
+  const { getRecipe, addRecipe, updateRecipe } = useData()
   const existing = editId ? getRecipe(editId) : undefined
 
   const [form, setForm] = useState(() => {
@@ -94,7 +95,7 @@ export default function AddRecipe() {
     update('categories', cats)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const ingredients = form.ingredients.map((s) => s.trim()).filter(Boolean)
     const instructions = form.instructions.map((s) => s.trim()).filter(Boolean)
@@ -105,7 +106,7 @@ export default function AddRecipe() {
     const categories = form.categories.length > 0 ? form.categories : autoCategorize({ title: form.title, ingredients, instructions })
     const now = new Date().toISOString()
     if (existing) {
-      updateRecipe(existing.id, {
+      await updateRecipe(existing.id, {
         title: form.title.trim(),
         source: form.source,
         sourceUrl: form.sourceUrl?.trim() || undefined,
@@ -135,7 +136,7 @@ export default function AddRecipe() {
         createdAt: now,
         updatedAt: now,
       }
-      addRecipe(recipe)
+      await addRecipe(recipe)
       navigate(`/recipe/${recipe.id}`)
     }
   }

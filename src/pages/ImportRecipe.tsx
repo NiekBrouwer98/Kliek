@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import type { Recipe, RecipeSource } from '../types/recipe'
-import { addRecipe } from '../lib/storage'
+import { useData } from '../contexts/DataContext'
 import { autoCategorize } from '../lib/categories'
 import { parsePastedText, extractTextFromPdf } from '../lib/importParser'
 
@@ -24,9 +24,10 @@ export default function ImportRecipe() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
+  const { addRecipe } = useData()
 
   const createRecipeFromParsed = useCallback(
-    (title: string, ingredients: string[], instructions: string[], sourceType: RecipeSource, sourceUrl?: string) => {
+    async (title: string, ingredients: string[], instructions: string[], sourceType: RecipeSource, sourceUrl?: string) => {
       const categories = autoCategorize({ title, ingredients, instructions })
       const now = new Date().toISOString()
       const recipe: Recipe = {
@@ -40,13 +41,13 @@ export default function ImportRecipe() {
         createdAt: now,
         updatedAt: now,
       }
-      addRecipe(recipe)
+      await addRecipe(recipe)
       navigate(`/recipe/${recipe.id}`)
     },
-    [navigate]
+    [navigate, addRecipe]
   )
 
-  const handlePasteSubmit = (e: React.FormEvent) => {
+  const handlePasteSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     if (!pasteText.trim()) {
@@ -58,7 +59,7 @@ export default function ImportRecipe() {
       setError("Couldn't detect ingredients or instructions. Try adding headings like 'Ingredients' and 'Instructions'.")
       return
     }
-    createRecipeFromParsed(parsed.title, parsed.ingredients, parsed.instructions, source)
+    await createRecipeFromParsed(parsed.title, parsed.ingredients, parsed.instructions, source)
   }
 
   const handlePdfSubmit = async (e: React.FormEvent) => {
@@ -77,7 +78,7 @@ export default function ImportRecipe() {
         return
       }
       const parsed = parsePastedText(text, pdfFile.name.replace(/\.pdf$/i, ''))
-      createRecipeFromParsed(parsed.title, parsed.ingredients, parsed.instructions, 'pdf')
+      await createRecipeFromParsed(parsed.title, parsed.ingredients, parsed.instructions, 'pdf')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to read PDF.')
     } finally {

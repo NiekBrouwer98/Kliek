@@ -193,7 +193,7 @@ function extractRecipeInPage() {
   return { error: 'No recipe found on this page.' };
 }
 
-const KLIEK_APP_ORIGINS = ['http://localhost:5173', 'http://localhost:4173'];
+const KLIEK_APP_ORIGINS = ['https://kliek-deployed.vercel.app', 'http://localhost:5173', 'http://localhost:4173'];
 
 function getAppUrl() {
   return KLIEK_APP_ORIGINS[0];

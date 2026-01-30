@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import type { Recipe } from '../types/recipe'
-import { addRecipe } from '../lib/storage'
+import { useData } from '../contexts/DataContext'
 import { autoCategorize } from '../lib/categories'
 
 const PENDING_IMPORT_KEY = 'kliek-pending-import'
@@ -18,7 +18,7 @@ interface ExtensionRecipePayload {
   cookTimeMinutes?: number
 }
 
-function processPendingImport(): string | null {
+function processPendingImport(addRecipe: (recipe: Recipe) => Promise<void>): string | null {
   try {
     const raw = localStorage.getItem(PENDING_IMPORT_KEY)
     if (!raw) return null
@@ -54,7 +54,7 @@ function processPendingImport(): string | null {
       createdAt: now,
       updatedAt: now,
     }
-    addRecipe(recipe)
+    void addRecipe(recipe)
     return recipe.id
   } catch {
     localStorage.removeItem(PENDING_IMPORT_KEY)
@@ -68,14 +68,15 @@ function processPendingImport(): string | null {
  */
 export function usePendingExtensionImport() {
   const navigate = useNavigate()
+  const { addRecipe } = useData()
 
   useEffect(() => {
-    function handle() {
-      const recipeId = processPendingImport()
+    async function handle() {
+      const recipeId = await processPendingImport(addRecipe)
       if (recipeId) navigate(`/recipe/${recipeId}`, { replace: true })
     }
 
-    handle()
+    void handle()
 
     window.addEventListener('kliek-pending-import', handle)
 

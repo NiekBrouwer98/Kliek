@@ -4,7 +4,7 @@ This extension lets you import recipes **directly from a URL**. When you're on a
 
 ## Setup
 
-1. **Run the Kliek app** at `http://localhost:5173` (or 4173 for preview).
+1. **Run the Kliek app** at [https://kliek-deployed.vercel.app](https://kliek-deployed.vercel.app) (or `http://localhost:5173` for local dev).
 2. **Load the extension** in Chrome:
    - Open `chrome://extensions`
    - Turn on **Developer mode**
@@ -20,7 +20,7 @@ This extension lets you import recipes **directly from a URL**. When you're on a
 
 ## Production / other origins
 
-The manifest allows `http://localhost:5173/*` and `http://localhost:4173/*`. If you deploy the app to e.g. `https://kliek.example.com`, add that origin to `host_permissions` in `manifest.json` and set the same origin in `popup.js` in `KLIEK_APP_ORIGINS` and `getAppUrl()`.
+The extension sends recipes to **https://kliek-deployed.vercel.app** by default (see `KLIEK_APP_ORIGINS` in `popup.js`). The manifest allows that origin and localhost. To use a different URL, add it to `host_permissions` in `manifest.json` and put it first in `KLIEK_APP_ORIGINS` in `popup.js` (or change `getAppUrl()` to return it).
 
 ## Optional: custom icons
 

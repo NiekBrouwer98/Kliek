@@ -1,14 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getRecipes } from '../lib/storage'
+import { useData } from '../contexts/DataContext'
 import RecipeCard from '../components/RecipeCard'
 
-function useRecipes() {
-  return useState(getRecipes())
-}
-
 export default function RecipeList() {
-  const [recipes] = useRecipes()
+  const { recipes, recipesLoading } = useData()
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('')
 
@@ -77,7 +73,11 @@ export default function RecipeList() {
         </select>
       </div>
 
-      {filtered.length === 0 ? (
+      {recipesLoading ? (
+        <div className="bg-white/80 rounded-2xl border border-amber-200/60 p-12 text-center text-amber-800/80">
+          Loading recipes…
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="bg-white/80 rounded-2xl border border-amber-200/60 p-12 text-center text-amber-800/80">
           {recipes.length === 0 ? (
             <>

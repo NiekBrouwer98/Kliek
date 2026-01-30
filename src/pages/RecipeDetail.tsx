@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getRecipe, deleteRecipe } from '../lib/storage'
+import { useData } from '../contexts/DataContext'
 
 const sourceLabels: Record<string, string> = {
   manual: 'Manual',
@@ -12,6 +12,7 @@ const sourceLabels: Record<string, string> = {
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { getRecipe, deleteRecipe } = useData()
   const recipe = id ? getRecipe(id) : undefined
 
   if (!recipe) {
@@ -27,9 +28,9 @@ export default function RecipeDetail() {
 
   const totalTime = [recipe.prepTimeMinutes, recipe.cookTimeMinutes].filter(Boolean).reduce((a, b) => (a ?? 0) + (b ?? 0), 0)
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm('Delete this recipe?')) {
-      deleteRecipe(recipe.id)
+      await deleteRecipe(recipe.id)
       navigate('/')
     }
   }
@@ -46,7 +47,7 @@ export default function RecipeDetail() {
             </div>
           )}
           <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
-            {recipe.categories.map((cat) => (
+            {recipe.categories.map((cat: string) => (
               <span
                 key={cat}
                 className="px-2.5 py-1 rounded-full text-sm font-medium bg-amber-900/80 text-amber-50"
@@ -95,7 +96,7 @@ export default function RecipeDetail() {
           <section className="mt-8">
             <h2 className="font-recipe text-lg font-semibold text-amber-900 mb-2">Instructions</h2>
             <ol className="list-decimal list-inside space-y-2 text-amber-900/90">
-              {recipe.instructions.map((step, i) => (
+              {recipe.instructions.map((step: string, i: number) => (
                 <li key={i}>{step}</li>
               ))}
             </ol>

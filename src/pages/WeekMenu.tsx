@@ -10,8 +10,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { getRecipes } from '../lib/storage'
-import { getWeekMenu, saveWeekMenu } from '../lib/storage'
+import { useData } from '../contexts/DataContext'
 import type { Recipe, WeekMenuSlot } from '../types/recipe'
 import RecipeCardDraggable from '../components/RecipeCardDraggable'
 
@@ -90,13 +89,23 @@ export default function WeekMenu() {
   const [year, setYear] = useState(() => getYear(today))
   const [week, setWeek] = useState(() => getWeekNumber(today))
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [recipes] = useState(getRecipes())
+  const { recipes, getWeekMenu, saveWeekMenu } = useData()
+  const [slots, setSlots] = useState<WeekMenuSlot[]>([])
+  const [menuLoading, setMenuLoading] = useState(true)
 
-  const menu = useMemo(() => getWeekMenu(year, week), [year, week])
-  const [slots, setSlots] = useState<WeekMenuSlot[]>(menu.slots)
   useEffect(() => {
-    setSlots(getWeekMenu(year, week).slots)
-  }, [year, week])
+    let cancelled = false
+    setMenuLoading(true)
+    getWeekMenu(year, week).then((menu) => {
+      if (!cancelled) {
+        setSlots(menu.slots)
+        setMenuLoading(false)
+      }
+    }).catch(() => {
+      if (!cancelled) setMenuLoading(false)
+    })
+    return () => { cancelled = true }
+  }, [year, week, getWeekMenu])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -113,7 +122,7 @@ export default function WeekMenu() {
       const next = prev.map((s) =>
         s.day === day && s.meal === meal ? { ...s, recipeId } : s
       )
-      saveWeekMenu({ year, week, slots: next })
+      void saveWeekMenu({ year, week, slots: next })
       return next
     })
   }
@@ -172,6 +181,9 @@ export default function WeekMenu() {
         Drag recipes from the list below into the week grid. You can also open a recipe and click &quot;Add to week menu&quot; then choose a day/meal (future: we&apos;ll add that picker).
       </p>
 
+      {menuLoading && (
+        <p className="text-amber-800/80 mb-4">Loading week menu…</p>
+      )}
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
