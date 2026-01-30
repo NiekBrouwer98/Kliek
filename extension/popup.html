@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kliek</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        width: 320px;
+        margin: 0;
+        padding: 16px;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        color: #1c1917;
+        background: #fef7ed;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #78350f;
+      }
+      p {
+        margin: 0 0 16px;
+        color: #78716c;
+        line-height: 1.4;
+      }
+      button {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #fff;
+        background: #b45309;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      button:hover { background: #92400e; }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .status {
+        margin-top: 12px;
+        padding: 8px 12px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+      .status.success { background: #d1fae5; color: #065f46; }
+      .status.error { background: #fee2e2; color: #991b1b; }
+      .status.hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <h1>Kliek</h1>
+    <p>Extract the recipe from this page and send it to your Kliek app.</p>
+    <button id="send" type="button">Send recipe to Kliek</button>
+    <div id="status" class="status hidden"></div>
+    <script src="popup.js"></script>
+  </body>
+</html>

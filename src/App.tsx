@@ -1,0 +1,68 @@
+import { Routes, Route, NavLink } from 'react-router-dom'
+import { usePendingExtensionImport } from './hooks/usePendingExtensionImport'
+import RecipeList from './pages/RecipeList'
+import RecipeDetail from './pages/RecipeDetail'
+import AddRecipe from './pages/AddRecipe'
+import ImportRecipe from './pages/ImportRecipe'
+import WeekMenu from './pages/WeekMenu'
+
+function App() {
+  usePendingExtensionImport()
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <header className="bg-amber-900/90 text-amber-50 shadow-lg sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <NavLink to="/" className="font-recipe text-xl font-semibold tracking-tight hover:opacity-90">
+            Kliek
+          </NavLink>
+          <nav className="flex items-center gap-1 sm:gap-2">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+              }
+            >
+              Recipes
+            </NavLink>
+            <NavLink
+              to="/add"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+              }
+            >
+              Add recipe
+            </NavLink>
+            <NavLink
+              to="/import"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+              }
+            >
+              Import
+            </NavLink>
+            <NavLink
+              to="/week-menu"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+              }
+            >
+              Week menu
+            </NavLink>
+          </nav>
+        </div>
+      </header>
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+        <Routes>
+          <Route path="/" element={<RecipeList />} />
+          <Route path="/recipe/:id" element={<RecipeDetail />} />
+          <Route path="/add" element={<AddRecipe />} />
+          <Route path="/import" element={<ImportRecipe />} />
+          <Route path="/week-menu" element={<WeekMenu />} />
+        </Routes>
+      </main>
+    </div>
+  )
+}
+
+export default App
