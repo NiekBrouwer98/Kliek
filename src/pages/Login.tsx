@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { hasSupabase } from '../lib/supabase'
 
 export default function Login() {
   const [searchParams] = useSearchParams()
@@ -12,6 +13,24 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+
+  if (!hasSupabase()) {
+    return (
+      <div className="max-w-sm mx-auto mt-12">
+        <div className="bg-white/95 rounded-2xl border border-amber-200/60 p-8 shadow-lg">
+          <h1 className="font-recipe text-2xl font-bold text-amber-950 mb-2">Sign in</h1>
+          <p className="text-amber-800/80 text-sm mb-4">
+            Sync is not configured for this deployment. To enable sign-in and sync across devices:
+          </p>
+          <ul className="list-disc list-inside text-sm text-amber-800/80 space-y-1 mb-6">
+            <li>Add <strong>VITE_SUPABASE_URL</strong> and <strong>VITE_SUPABASE_ANON_KEY</strong> to your deployment (e.g. Vercel → Settings → Environment Variables).</li>
+            <li>Redeploy so the new build picks up the variables.</li>
+          </ul>
+          <Link to="/" className="text-amber-700 font-medium hover:underline">← Back to recipes</Link>
+        </div>
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -66,6 +66,14 @@ To enable **sign-in and sync across devices** (e.g. iPhone and computer):
 
 Without Supabase (no `.env`), the app still works: recipes and week menus are stored only in the browser’s `localStorage` on that device.
 
+## Deploying to Vercel
+
+- **Build**: Vercel will run `npm run build` and serve the `dist` folder. Set the **Root Directory** to the repo root and **Framework Preset** to Vite (or leave auto).
+- **Environment variables**: In Vercel → Project → **Settings → Environment Variables**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` if you use Supabase sync.
+- **Fork vs original repo**: Vercel deploys from the Git repo it is connected to. If the deployment is connected to a **fork** of this repo, only pushes to that fork trigger new deploys; pushing to the original repository does **not** update the deployment. To get updates live, either:
+  - Push or merge your changes into the fork and let Vercel redeploy from the fork, or
+  - In Vercel → **Settings → Git**, disconnect the fork and connect the project to the original repository so pushes to the original trigger deploys.
+
 ## Data
 
 - **With Supabase**: Recipes and week menus are stored in your Supabase project (per user). Same data on every device when signed in.
