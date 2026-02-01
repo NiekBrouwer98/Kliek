@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useCallback, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import type { Recipe, RecipeSource } from '../types/recipe'
 import { useData } from '../contexts/DataContext'
@@ -8,6 +8,17 @@ import { parsePastedText, extractTextFromPdf } from '../lib/importParser'
 
 type ImportTab = 'paste' | 'pdf' | 'url'
 
+interface FetchedRecipe {
+  title: string
+  ingredients: string[]
+  instructions: string[]
+  sourceUrl: string
+  imageUrl?: string
+  servings?: number
+  prepTimeMinutes?: number
+  cookTimeMinutes?: number
+}
+
 const SOURCE_OPTIONS: { value: RecipeSource; label: string }[] = [
   { value: 'website', label: 'Website' },
   { value: 'instagram', label: 'Instagram' },
@@ -15,7 +26,15 @@ const SOURCE_OPTIONS: { value: RecipeSource; label: string }[] = [
   { value: 'pdf', label: 'PDF' },
 ]
 
+function inferSource(url: string): RecipeSource {
+  const u = url.toLowerCase()
+  if (u.includes('instagram.com')) return 'instagram'
+  if (u.includes('ah.nl') || u.includes('albert-heijn')) return 'albert-heijn'
+  return 'website'
+}
+
 export default function ImportRecipe() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [tab, setTab] = useState<ImportTab>('paste')
   const [pasteText, setPasteText] = useState('')
   const [source, setSource] = useState<RecipeSource>('website')
@@ -46,6 +65,70 @@ export default function ImportRecipe() {
     },
     [navigate, addRecipe]
   )
+
+  const createRecipeFromFetched = useCallback(
+    async (payload: FetchedRecipe) => {
+      const ingredients = payload.ingredients.filter((s) => typeof s === 'string' && s.trim().length > 0)
+      const instructions = payload.instructions.filter((s) => typeof s === 'string' && s.trim().length > 0)
+      const categories = autoCategorize({
+        title: payload.title,
+        ingredients,
+        instructions,
+      })
+      const now = new Date().toISOString()
+      const recipe: Recipe = {
+        id: uuidv4(),
+        title: payload.title?.trim() || 'Imported recipe',
+        source: inferSource(payload.sourceUrl),
+        sourceUrl: payload.sourceUrl,
+        imageUrl: payload.imageUrl,
+        servings: payload.servings,
+        prepTimeMinutes: payload.prepTimeMinutes,
+        cookTimeMinutes: payload.cookTimeMinutes,
+        ingredients,
+        instructions,
+        categories,
+        createdAt: now,
+        updatedAt: now,
+      }
+      await addRecipe(recipe)
+      navigate(`/recipe/${recipe.id}`)
+    },
+    [navigate, addRecipe]
+  )
+
+  const fetchRecipeFromUrl = useCallback(
+    async (targetUrl: string) => {
+      setError(null)
+      setLoading(true)
+      try {
+        const apiUrl = `${window.location.origin}/api/fetch-recipe?url=${encodeURIComponent(targetUrl)}`
+        const res = await fetch(apiUrl)
+        const data = await res.json()
+        if (!res.ok) {
+          setError(data?.error || `Failed to fetch (${res.status})`)
+          return
+        }
+        await createRecipeFromFetched(data as FetchedRecipe)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch recipe from URL.')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [createRecipeFromFetched]
+  )
+
+  useEffect(() => {
+    const sharedUrl = searchParams.get('url')
+    if (!sharedUrl || !sharedUrl.startsWith('http')) return
+    setSearchParams({}, { replace: true })
+    setTab('url')
+    setUrl(sharedUrl)
+    void fetchRecipeFromUrl(sharedUrl)
+    // Only run when landing with a shared URL (e.g. from Share sheet on iPhone)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handlePasteSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,18 +169,14 @@ export default function ImportRecipe() {
     }
   }
 
-  const handleUrlSubmit = (e: React.FormEvent) => {
+  const handleUrlSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
     const u = url.trim()
     if (!u) {
       setError('Enter a URL first.')
       return
     }
-    setError(
-      'Importing directly from a URL is not supported in the browser (due to CORS). ' +
-        'Open the recipe page, copy the recipe text (ingredients + instructions), then use the "Paste" tab and paste it here.'
-    )
+    await fetchRecipeFromUrl(u)
   }
 
   return (
@@ -195,14 +274,15 @@ export default function ImportRecipe() {
               placeholder="https://..."
             />
             <p className="mt-2 text-sm text-amber-800/80">
-              Browsers block reading other websites from this app. Open the link, copy the recipe text, then use the Paste tab.
+              Paste a link to a recipe page (website, Instagram, Albert Heijn, etc.). We’ll fetch and import it.
             </p>
           </div>
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-amber-700 text-white font-medium hover:bg-amber-800 transition-colors"
+            disabled={loading}
+            className="px-6 py-2.5 rounded-xl bg-amber-700 text-white font-medium hover:bg-amber-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Open instructions
+            {loading ? 'Fetching…' : 'Fetch and import'}
           </button>
         </form>
       )}

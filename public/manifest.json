@@ -1,0 +1,19 @@
+{
+  "name": "Kliek – Personal Recipe Book",
+  "short_name": "Kliek",
+  "description": "Save and organize your recipes. Import from websites, Instagram, Albert Heijn, or add your own.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1c1917",
+  "theme_color": "#78350f",
+  "orientation": "any",
+  "share_target": {
+    "action": "/import",
+    "method": "GET",
+    "params": {
+      "url": "url",
+      "title": "title",
+      "text": "text"
+    }
+  }
+}

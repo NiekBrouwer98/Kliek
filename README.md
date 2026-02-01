@@ -8,7 +8,8 @@ A personal recipe app where you can save recipes from different sources, add you
   - **Browser extension**: Install the Kliek extension (see below) and use **Send recipe to Kliek** on any recipe page. The extension extracts the recipe (Schema.org JSON-LD or DOM) and sends it straight into the app.
   - **Paste**: Copy recipe text from any website, Instagram, or the Albert Heijn app and paste it. The app parses ingredients and instructions automatically.
   - **PDF**: Upload a PDF; text is extracted and parsed into a recipe.
-  - **Website URL**: Without the extension, browsers block reading other sites from the app, so you’re guided to copy the recipe and use the Paste tab.
+  - **Website URL**: Paste a recipe page URL and click **Fetch and import**; the app fetches and parses the page via an API (works on desktop and mobile).
+  - **Share on iPhone**: Add Kliek to your home screen (Install from Safari), then in Instagram or any app tap **Share** → **Kliek** with a recipe link; Kliek opens and imports the recipe automatically.
 - **Add your own recipes** via a form with fixed fields: title, source, image URL, servings, prep/cook time, ingredients, instructions, categories, notes.
 - **Unified format**: All recipes are stored and shown in the same layout (ingredients list, numbered instructions, categories).
 - **Auto-categorization**: Recipes are tagged automatically (e.g. Pasta, Salad, Vegetarian, Quick & Easy) from title and text.
@@ -65,6 +66,13 @@ To enable **sign-in and sync across devices** (e.g. iPhone and computer):
 5. Restart the dev server. You’ll see **Sign in** in the header; sign up with email/password. Recipes and week menus are then stored in Supabase and sync to all devices where you’re signed in.
 
 Without Supabase (no `.env`), the app still works: recipes and week menus are stored only in the browser’s `localStorage` on that device.
+
+## Using Kliek on iPhone (import from Instagram etc.)
+
+1. Open the Kliek app in Safari (e.g. [kliek-deployed.vercel.app](https://kliek-deployed.vercel.app)).
+2. Tap the **Share** button in Safari and choose **Add to Home Screen** so Kliek appears as an app.
+3. When you see a recipe you want to save (e.g. in Instagram, Safari, or Albert Heijn), tap **Share** and select **Kliek**. Kliek opens and fetches the recipe from the link, then saves it to your collection.
+4. You can also open Kliek, go to **Import**, choose the **Website URL** tab, paste a link, and tap **Fetch and import**.
 
 ## Deploying to Vercel
 
