@@ -207,17 +207,29 @@ export async function GET(request: Request) {
     })
   }
   try {
+    const targetOrigin = new URL(targetUrl).origin
     const res = await fetch(targetUrl, {
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/119.0',
-        Accept: 'text/html,application/xhtml+xml',
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
+        Referer: targetOrigin + '/',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Upgrade-Insecure-Requests': '1',
       },
       redirect: 'follow',
     })
     if (!res.ok) {
+      const isBlocked = res.status === 403 || res.status === 429
+      const message = isBlocked
+        ? `The recipe site blocked the request (${res.status}). Try opening the link in your browser, copy the recipe text, and use the Paste tab.`
+        : `Failed to fetch: ${res.status}`
       return new Response(
-        JSON.stringify({ error: `Failed to fetch: ${res.status}` }),
+        JSON.stringify({ error: message }),
         { status: 502, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin } }
       )
     }

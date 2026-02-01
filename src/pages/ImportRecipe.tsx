@@ -276,6 +276,9 @@ export default function ImportRecipe() {
             <p className="mt-2 text-sm text-amber-800/80">
               Paste a link to a recipe page (website, Instagram, Albert Heijn, etc.). We’ll fetch and import it.
             </p>
+            <p className="mt-2 text-sm text-amber-700/90 italic">
+              On iPhone: Kliek doesn’t appear in the Share menu (iOS doesn’t support it). Copy the recipe link from Instagram or Safari, open Kliek, then paste the link here and tap Fetch and import.
+            </p>
           </div>
           <button
             type="submit"
