@@ -14,17 +14,17 @@ function App() {
   const { user, signOut } = useAuth()
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-amber-900/90 text-amber-50 shadow-lg sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <NavLink to="/" className="font-recipe text-xl font-semibold tracking-tight hover:opacity-90">
+    <div className="min-h-screen flex flex-col bg-cream">
+      <header className="bg-cream-2 border-b border-border sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+          <NavLink to="/" className="font-recipe text-xl font-semibold text-ink tracking-tight hover:text-olive transition-colors">
             Kliek
           </NavLink>
           <nav className="flex items-center gap-1 sm:gap-2">
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${isActive ? 'bg-sage text-white' : 'text-ink-muted hover:text-olive hover:bg-sage/10'}`
               }
             >
               Recipes
@@ -32,7 +32,7 @@ function App() {
             <NavLink
               to="/add"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${isActive ? 'bg-sage text-white' : 'text-ink-muted hover:text-olive hover:bg-sage/10'}`
               }
             >
               Add recipe
@@ -40,7 +40,7 @@ function App() {
             <NavLink
               to="/import"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${isActive ? 'bg-sage text-white' : 'text-ink-muted hover:text-olive hover:bg-sage/10'}`
               }
             >
               Import
@@ -48,20 +48,20 @@ function App() {
             <NavLink
               to="/week-menu"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${isActive ? 'bg-sage text-white' : 'text-ink-muted hover:text-olive hover:bg-sage/10'}`
               }
             >
               Week menu
             </NavLink>
             {user ? (
-              <span className="flex items-center gap-2">
-                <span className="text-amber-100 text-sm truncate max-w-[120px]" title={user.email}>
+              <span className="flex items-center gap-2 ml-2 pl-2 border-l border-border">
+                <span className="text-ink-muted text-sm truncate max-w-[120px]" title={user.email}>
                   {user.email}
                 </span>
                 <button
                   type="button"
                   onClick={() => signOut()}
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-amber-100 hover:bg-amber-800/60"
+                  className="px-3 py-2 rounded-xl text-sm font-medium text-ink-muted hover:text-olive hover:bg-sage/10 transition-colors"
                 >
                   Log out
                 </button>
@@ -70,7 +70,7 @@ function App() {
               <NavLink
                 to="/login"
                 className={({ isActive }) =>
-                  `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-amber-800 text-white' : 'text-amber-100 hover:bg-amber-800/60'}`
+                  `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${isActive ? 'bg-sage text-white' : 'text-ink-muted hover:text-olive hover:bg-sage/10'}`
                 }
               >
                 Sign in
@@ -79,7 +79,7 @@ function App() {
           </nav>
         </div>
       </header>
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-5 py-10 sm:py-12">
         <ImportFromDeviceBanner />
         <Routes>
           <Route path="/" element={<RecipeList />} />

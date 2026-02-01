@@ -26,28 +26,28 @@ export default function RecipeCardDraggable({ recipe, compact }: RecipeCardDragg
       {...listeners}
       {...attributes}
       className={`
-        bg-white rounded-xl border border-amber-200/60 shadow-md cursor-grab active:cursor-grabbing
-        ${isDragging ? 'opacity-60 shadow-lg scale-105 z-50' : ''}
+        bg-white rounded-xl border border-border shadow-sm cursor-grab active:cursor-grabbing
+        ${isDragging ? 'opacity-60 shadow-md scale-[1.02] z-50' : ''}
         ${compact ? 'flex items-center gap-2' : 'overflow-hidden'}
       `}
     >
       {!compact && (
-        <div className="aspect-[4/3] bg-amber-100/80 relative overflow-hidden rounded-t-xl">
+        <div className="aspect-[4/3] bg-cream-2 relative overflow-hidden rounded-t-xl">
           {recipe.imageUrl ? (
             <img src={recipe.imageUrl} alt={recipe.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-amber-700/50">
+            <div className="w-full h-full flex items-center justify-center text-sage/40">
               <span className="text-2xl">🍳</span>
             </div>
           )}
         </div>
       )}
       <div className={compact ? 'p-2' : 'p-3'}>
-        <h3 className={`font-recipe font-semibold text-amber-950 line-clamp-2 ${compact ? 'text-sm' : 'text-base'}`}>
+        <h3 className={`font-recipe font-semibold text-ink line-clamp-2 ${compact ? 'text-sm' : 'text-base'}`}>
           {recipe.title}
         </h3>
         {!compact && (
-          <p className="mt-1 text-xs text-amber-800/80 capitalize">{sourceLabels[recipe.source]}</p>
+          <p className="mt-1 text-xs text-ink-muted capitalize">{sourceLabels[recipe.source]}</p>
         )}
       </div>
     </div>

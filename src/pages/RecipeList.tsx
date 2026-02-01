@@ -32,19 +32,19 @@ export default function RecipeList() {
   }, [recipes, search, categoryFilter])
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <h1 className="font-recipe text-2xl font-bold text-amber-950">My recipes</h1>
-        <div className="flex flex-wrap gap-2">
+    <div className="space-y-10">
+      <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
+        <h1 className="font-recipe text-3xl font-semibold text-ink">My recipes</h1>
+        <div className="flex flex-wrap gap-3">
           <Link
             to="/add"
-            className="px-4 py-2 rounded-xl bg-amber-700 text-white font-medium hover:bg-amber-800 transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-terracotta text-white font-medium hover:bg-terracotta-dark transition-colors shadow-sm"
           >
             Add recipe
           </Link>
           <Link
             to="/import"
-            className="px-4 py-2 rounded-xl bg-amber-600/90 text-white font-medium hover:bg-amber-700 transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-sage text-white font-medium hover:bg-sage-dark transition-colors shadow-sm"
           >
             Import
           </Link>
@@ -57,12 +57,12 @@ export default function RecipeList() {
           placeholder="Search recipes, ingredients, categories…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-amber-200 bg-white/90 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+          className="flex-1 min-w-0 px-4 py-3 rounded-xl border border-border bg-white text-ink placeholder:text-ink-muted focus:border-sage focus:ring-2 focus:ring-sage/20"
         />
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-4 py-2.5 rounded-xl border border-amber-200 bg-white/90 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className="px-4 py-3 rounded-xl border border-border bg-white text-ink focus:border-sage focus:ring-2 focus:ring-sage/20"
         >
           <option value="">All categories</option>
           {allCategories.map((c) => (
@@ -74,30 +74,32 @@ export default function RecipeList() {
       </div>
 
       {recipesLoading ? (
-        <div className="bg-white/80 rounded-2xl border border-amber-200/60 p-12 text-center text-amber-800/80">
+        <div className="rounded-2xl border border-border bg-white/80 py-16 text-center text-ink-muted">
           Loading recipes…
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white/80 rounded-2xl border border-amber-200/60 p-12 text-center text-amber-800/80">
+        <div className="rounded-2xl border border-border bg-white/80 py-16 px-6 text-center">
           {recipes.length === 0 ? (
             <>
-              <p className="font-recipe text-xl text-amber-900">No recipes yet</p>
-              <p className="mt-2">Add a recipe manually or import from a website, Instagram, Albert Heijn, or PDF.</p>
-              <div className="mt-6 flex justify-center gap-3">
-                <Link to="/add" className="px-4 py-2 rounded-xl bg-amber-700 text-white font-medium hover:bg-amber-800">
+              <p className="font-recipe text-xl text-ink">No recipes yet</p>
+              <p className="mt-3 text-ink-muted max-w-md mx-auto">
+                Add a recipe manually or import from a website, Instagram, Albert Heijn, or PDF.
+              </p>
+              <div className="mt-8 flex justify-center gap-3">
+                <Link to="/add" className="px-5 py-2.5 rounded-xl bg-terracotta text-white font-medium hover:bg-terracotta-dark">
                   Add recipe
                 </Link>
-                <Link to="/import" className="px-4 py-2 rounded-xl bg-amber-600/90 text-white font-medium hover:bg-amber-700">
+                <Link to="/import" className="px-5 py-2.5 rounded-xl bg-sage text-white font-medium hover:bg-sage-dark">
                   Import
                 </Link>
               </div>
             </>
           ) : (
-            <p>No recipes match your search or category filter.</p>
+            <p className="text-ink-muted">No recipes match your search or category filter.</p>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}

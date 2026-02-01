@@ -181,19 +181,19 @@ export default function ImportRecipe() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="font-recipe text-2xl font-bold text-amber-950 mb-2">Import recipe</h1>
-      <p className="text-amber-800/80 mb-6">
+      <h1 className="font-recipe text-2xl font-semibold text-ink mb-2">Import recipe</h1>
+      <p className="text-ink-muted mb-8">
         Paste text from a website, Instagram, or Albert Heijn; or upload a PDF. All recipes are normalized to the same format.
       </p>
 
-      <div className="flex gap-2 border-b border-amber-200 mb-6">
+      <div className="flex gap-2 border-b border-border mb-8">
         {(['paste', 'pdf', 'url'] as const).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`px-4 py-2 rounded-t-xl font-medium capitalize transition-colors ${
-              tab === t ? 'bg-amber-700 text-white' : 'bg-amber-100/80 text-amber-800 hover:bg-amber-200/80'
+            className={`px-4 py-2.5 rounded-t-xl font-medium capitalize transition-colors ${
+              tab === t ? 'bg-sage text-white' : 'bg-cream-2 text-ink-muted hover:bg-sage/10 hover:text-olive'
             }`}
           >
             {t === 'url' ? 'Website URL' : t}
@@ -202,36 +202,36 @@ export default function ImportRecipe() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-amber-100 border border-amber-300 text-amber-900">
+        <div className="mb-6 p-4 rounded-xl bg-cream-2 border border-border text-ink">
           {error}
         </div>
       )}
 
       {tab === 'paste' && (
-        <form onSubmit={handlePasteSubmit} className="space-y-4">
-          <div className="bg-white/95 rounded-2xl border border-amber-200/60 p-6 shadow-md">
-            <label className="block text-sm font-medium text-amber-900 mb-2">Where did you copy this from?</label>
+        <form onSubmit={handlePasteSubmit} className="space-y-5">
+          <div className="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-sm">
+            <label className="block text-sm font-medium text-ink mb-2">Where did you copy this from?</label>
             <select
               value={source}
               onChange={(e) => setSource(e.target.value as RecipeSource)}
-              className="w-full sm:w-auto px-4 py-2 rounded-xl border border-amber-200 bg-white focus:ring-2 focus:ring-amber-500 mb-4"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-border bg-white text-ink focus:border-sage focus:ring-2 focus:ring-sage/20 mb-4"
             >
               {SOURCE_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </select>
-            <label className="block text-sm font-medium text-amber-900 mb-2">Paste recipe text</label>
+            <label className="block text-sm font-medium text-ink mb-2">Paste recipe text</label>
             <textarea
               value={pasteText}
               onChange={(e) => setPasteText(e.target.value)}
               rows={12}
-              className="w-full px-4 py-3 rounded-xl border border-amber-200 bg-white focus:ring-2 focus:ring-amber-500 font-mono text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-border bg-white text-ink placeholder:text-ink-muted focus:border-sage focus:ring-2 focus:ring-sage/20 font-mono text-sm"
               placeholder="Paste the full recipe (title, ingredients, instructions). Headings like 'Ingredients' and 'Instructions' help parsing."
             />
           </div>
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-amber-700 text-white font-medium hover:bg-amber-800 transition-colors"
+            className="px-6 py-2.5 rounded-xl bg-terracotta text-white font-medium hover:bg-terracotta-dark transition-colors shadow-sm"
           >
             Import recipe
           </button>
@@ -239,23 +239,23 @@ export default function ImportRecipe() {
       )}
 
       {tab === 'pdf' && (
-        <form onSubmit={handlePdfSubmit} className="space-y-4">
-          <div className="bg-white/95 rounded-2xl border border-amber-200/60 p-6 shadow-md">
-            <label className="block text-sm font-medium text-amber-900 mb-2">Select PDF file</label>
+        <form onSubmit={handlePdfSubmit} className="space-y-5">
+          <div className="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-sm">
+            <label className="block text-sm font-medium text-ink mb-2">Select PDF file</label>
             <input
               type="file"
               accept=".pdf"
               onChange={(e) => setPdfFile(e.target.files?.[0] ?? null)}
-              className="w-full px-4 py-2 rounded-xl border border-amber-200 bg-white focus:ring-2 focus:ring-amber-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-amber-100 file:text-amber-900"
+              className="w-full px-4 py-2.5 rounded-xl border border-border bg-white text-ink focus:border-sage focus:ring-2 focus:ring-sage/20 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-cream-2 file:text-ink"
             />
-            <p className="mt-2 text-sm text-amber-800/80">
+            <p className="mt-2 text-sm text-ink-muted">
               Text will be extracted and parsed into ingredients and instructions. Scanned PDFs (images) are not supported.
             </p>
           </div>
           <button
             type="submit"
             disabled={!pdfFile || loading}
-            className="px-6 py-2.5 rounded-xl bg-amber-700 text-white font-medium hover:bg-amber-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 rounded-xl bg-terracotta text-white font-medium hover:bg-terracotta-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {loading ? 'Processing…' : 'Import from PDF'}
           </button>
@@ -263,27 +263,27 @@ export default function ImportRecipe() {
       )}
 
       {tab === 'url' && (
-        <form onSubmit={handleUrlSubmit} className="space-y-4">
-          <div className="bg-white/95 rounded-2xl border border-amber-200/60 p-6 shadow-md">
-            <label className="block text-sm font-medium text-amber-900 mb-2">Recipe page URL</label>
+        <form onSubmit={handleUrlSubmit} className="space-y-5">
+          <div className="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-sm">
+            <label className="block text-sm font-medium text-ink mb-2">Recipe page URL</label>
             <input
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-amber-200 bg-white focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-2.5 rounded-xl border border-border bg-white text-ink placeholder:text-ink-muted focus:border-sage focus:ring-2 focus:ring-sage/20"
               placeholder="https://..."
             />
-            <p className="mt-2 text-sm text-amber-800/80">
+            <p className="mt-2 text-sm text-ink-muted">
               Paste a link to a recipe page (website, Instagram, Albert Heijn, etc.). We’ll fetch and import it.
             </p>
-            <p className="mt-2 text-sm text-amber-700/90 italic">
+            <p className="mt-2 text-sm text-olive italic">
               On iPhone: Kliek doesn’t appear in the Share menu (iOS doesn’t support it). Copy the recipe link from Instagram or Safari, open Kliek, then paste the link here and tap Fetch and import.
             </p>
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 rounded-xl bg-amber-700 text-white font-medium hover:bg-amber-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 rounded-xl bg-terracotta text-white font-medium hover:bg-terracotta-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {loading ? 'Fetching…' : 'Fetch and import'}
           </button>

@@ -30,7 +30,7 @@ export default function ImportFromDeviceBanner() {
   }
 
   return (
-    <div className="mb-6 p-4 rounded-2xl bg-amber-100 border border-amber-300 text-amber-900 flex flex-wrap items-center justify-between gap-3">
+    <div className="mb-8 p-5 rounded-2xl bg-cream-2 border border-border text-ink flex flex-wrap items-center justify-between gap-3">
       <p className="font-medium">
         You have {localRecipes.length} recipe{localRecipes.length === 1 ? '' : 's'} on this device. Import them to sync across all devices?
       </p>
@@ -39,14 +39,14 @@ export default function ImportFromDeviceBanner() {
           type="button"
           onClick={handleImport}
           disabled={importing}
-          className="px-4 py-2 rounded-xl bg-amber-700 text-white font-medium hover:bg-amber-800 disabled:opacity-50"
+          className="px-4 py-2.5 rounded-xl bg-sage text-white font-medium hover:bg-sage-dark disabled:opacity-50 transition-colors shadow-sm"
         >
           {importing ? 'Importing…' : 'Import'}
         </button>
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="px-4 py-2 rounded-xl text-amber-800 hover:bg-amber-200/60"
+          className="px-4 py-2.5 rounded-xl text-ink-muted hover:bg-white hover:text-ink transition-colors"
         >
           Dismiss
         </button>

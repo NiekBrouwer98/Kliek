@@ -3,14 +3,39 @@
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Fraunces", ui-serif, Georgia, serif;
+
+  /* Cookbook palette: off-white, sage, olive, terracotta */
+  --color-cream: #faf9f6;
+  --color-cream-2: #f5f3ef;
+  --color-sage: #9caa8a;
+  --color-sage-dark: #7d8b6a;
+  --color-olive: #5c6b4a;
+  --color-olive-dark: #4a5a3a;
+  --color-terracotta: #c17f59;
+  --color-terracotta-dark: #a86a45;
+  --color-terracotta-darker: #8b5a3c;
+  --color-ink: #2d2a26;
+  --color-ink-muted: #5c5854;
+  --color-border: #e8e6e2;
+  --color-border-soft: #ebe9e5;
 }
 
 body {
   font-family: var(--font-sans);
-  background: linear-gradient(135deg, #fef7ed 0%, #f5ebe0 50%, #f0e6dc 100%);
+  background: var(--color-cream);
+  color: var(--color-ink);
   min-height: 100vh;
+  line-height: 1.6;
 }
 
 .font-recipe {
   font-family: var(--font-serif);
+}
+
+/* Soft focus ring for inputs */
+input:focus, select:focus, textarea:focus, button:focus-visible {
+  outline: none;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-cream), 0 0 0 4px var(--color-sage);
 }

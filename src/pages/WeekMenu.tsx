@@ -46,27 +46,27 @@ function WeekSlot({
     <div
       ref={setNodeRef}
       className={`
-        min-h-[80px] rounded-xl border-2 border-dashed p-2 transition-colors
-        ${isOver ? 'border-amber-500 bg-amber-50' : 'border-amber-200 bg-white/60'}
+        min-h-[80px] rounded-xl border-2 border-dashed p-3 transition-colors
+        ${isOver ? 'border-sage bg-sage/10' : 'border-border bg-white/80'}
       `}
     >
       {recipe ? (
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <p className="font-recipe font-medium text-amber-950 truncate">{recipe.title}</p>
-            <p className="text-xs text-amber-700">Lunch / Dinner</p>
+            <p className="font-recipe font-medium text-ink truncate">{recipe.title}</p>
+            <p className="text-xs text-ink-muted">Lunch / Dinner</p>
           </div>
           <button
             type="button"
             onClick={onClear}
-            className="flex-shrink-0 p-1 rounded text-amber-600 hover:bg-amber-100"
+            className="flex-shrink-0 p-1.5 rounded-lg text-ink-muted hover:bg-cream-2 hover:text-ink transition-colors"
             aria-label="Remove"
           >
             ×
           </button>
         </div>
       ) : (
-        <p className="text-sm text-amber-600/80 py-2">Drop recipe here</p>
+        <p className="text-sm text-ink-muted py-2">Drop recipe here</p>
       )}
     </div>
   )
@@ -78,7 +78,7 @@ function DraggableRecipeItem({ recipe }: { recipe: Recipe }) {
     data: { type: 'recipe', recipe },
   })
   return (
-    <div ref={setNodeRef} {...listeners} {...attributes} className={isDragging ? 'opacity-60' : ''}>
+    <div ref={setNodeRef} {...listeners} {...attributes} className={isDragging ? 'opacity-50' : ''}>
       <RecipeCardDraggable recipe={recipe} compact={true} />
     </div>
   )
@@ -153,9 +153,9 @@ export default function WeekMenu() {
   }, [year, week])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-wrap items-center gap-4">
-        <h1 className="font-recipe text-2xl font-bold text-amber-950">Week menu</h1>
+        <h1 className="font-recipe text-2xl font-semibold text-ink">Week menu</h1>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -163,55 +163,55 @@ export default function WeekMenu() {
             max={2100}
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
-            className="w-20 px-3 py-2 rounded-xl border border-amber-200 bg-white focus:ring-2 focus:ring-amber-500"
+            className="w-20 px-3 py-2.5 rounded-xl border border-border bg-white text-ink focus:border-sage focus:ring-2 focus:ring-sage/20"
           />
-          <span className="text-amber-800">Week</span>
+          <span className="text-ink-muted">Week</span>
           <input
             type="number"
             min={1}
             max={53}
             value={week}
             onChange={(e) => setWeek(Number(e.target.value))}
-            className="w-14 px-3 py-2 rounded-xl border border-amber-200 bg-white focus:ring-2 focus:ring-amber-500"
+            className="w-14 px-3 py-2.5 rounded-xl border border-border bg-white text-ink focus:border-sage focus:ring-2 focus:ring-sage/20"
           />
         </div>
       </div>
 
-      <p className="text-amber-800/80">
+      <p className="text-ink-muted">
         Drag recipes from the list below into the week grid. You can also open a recipe and click &quot;Add to week menu&quot; then choose a day/meal (future: we&apos;ll add that picker).
       </p>
 
       {menuLoading && (
-        <p className="text-amber-800/80 mb-4">Loading week menu…</p>
+        <p className="text-ink-muted mb-4">Loading week menu…</p>
       )}
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="text-left p-2 text-amber-900 font-medium w-28">Day</th>
-                <th className="text-left p-2 text-amber-900 font-medium">Lunch</th>
-                <th className="text-left p-2 text-amber-900 font-medium">Dinner</th>
+                <th className="text-left p-3 text-ink font-medium w-28">Day</th>
+                <th className="text-left p-3 text-ink font-medium">Lunch</th>
+                <th className="text-left p-3 text-ink font-medium">Dinner</th>
               </tr>
             </thead>
             <tbody>
               {DAY_NAMES.map((name, day) => (
-                <tr key={day} className="border-t border-amber-200/60">
-                  <td className="p-2 align-top">
-                    <span className="font-medium text-amber-900">{name}</span>
-                    <span className="block text-xs text-amber-600">
+                <tr key={day} className="border-t border-border">
+                  <td className="p-3 align-top">
+                    <span className="font-medium text-ink">{name}</span>
+                    <span className="block text-xs text-ink-muted">
                       {new Date(weekStart.getTime() + day * 86400000).getDate()}/
                       {new Date(weekStart.getTime() + day * 86400000).getMonth() + 1}
                     </span>
                   </td>
-                  <td className="p-2 align-top w-[50%]">
+                  <td className="p-3 align-top w-[50%]">
                     <WeekSlot
                       slot={getSlot(day, 'lunch')}
                       recipe={getRecipeForSlot(getSlot(day, 'lunch'))}
                       onClear={() => setSlotRecipe(day, 'lunch', null)}
                     />
                   </td>
-                  <td className="p-2 align-top w-[50%]">
+                  <td className="p-3 align-top w-[50%]">
                     <WeekSlot
                       slot={getSlot(day, 'dinner')}
                       recipe={getRecipeForSlot(getSlot(day, 'dinner'))}
@@ -224,21 +224,21 @@ export default function WeekMenu() {
           </table>
         </div>
 
-        <div className="mt-8">
-          <h2 className="font-recipe text-lg font-semibold text-amber-950 mb-3">Recipes – drag to week</h2>
+        <div className="mt-10">
+          <h2 className="font-recipe text-lg font-semibold text-ink mb-4">Recipes – drag to week</h2>
           <div className="flex flex-wrap gap-3">
             {recipes.map((recipe) => (
               <DraggableRecipeItem key={recipe.id} recipe={recipe} />
             ))}
           </div>
           {recipes.length === 0 && (
-            <p className="text-amber-800/80">Add or import recipes first, then drag them here.</p>
+            <p className="text-ink-muted">Add or import recipes first, then drag them here.</p>
           )}
         </div>
 
         <DragOverlay>
           {activeId && getRecipe(activeId) ? (
-            <div className="w-48 opacity-95 shadow-xl rounded-xl overflow-hidden bg-white border border-amber-200">
+            <div className="w-48 opacity-95 shadow-lg rounded-xl overflow-hidden bg-white border border-border">
               <RecipeCardDraggable recipe={getRecipe(activeId)!} compact={true} />
             </div>
           ) : null}

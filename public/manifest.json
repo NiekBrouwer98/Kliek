@@ -4,8 +4,8 @@
   "description": "Save and organize your recipes. Import from websites, Instagram, Albert Heijn, or add your own.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1c1917",
-  "theme_color": "#78350f",
+  "background_color": "#faf9f6",
+  "theme_color": "#5c6b4a",
   "orientation": "any",
   "share_target": {
     "action": "/import",
