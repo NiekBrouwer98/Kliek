@@ -103,7 +103,6 @@ export default function WeekMenu() {
     return recipes.filter(
       (r) =>
         r.title.toLowerCase().includes(q) ||
-        (r.description && r.description.toLowerCase().includes(q)) ||
         (r.categories && r.categories.some((c) => c.toLowerCase().includes(q)))
     )
   }, [recipes, searchQuery])
