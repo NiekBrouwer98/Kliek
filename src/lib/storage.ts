@@ -68,3 +68,22 @@ export function saveWeekMenu(menu: WeekMenu): void {
   menus.push(menu)
   localStorage.setItem(WEEK_MENUS_KEY, JSON.stringify(menus))
 }
+
+const GROCERY_REMOVED_PREFIX = 'kliek-grocery-removed-'
+
+function groceryRemovedKey(year: number, week: number): string {
+  return `${GROCERY_REMOVED_PREFIX}${year}-${week}`
+}
+
+export function getRemovedGroceryItems(year: number, week: number): string[] {
+  try {
+    const raw = localStorage.getItem(groceryRemovedKey(year, week))
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+export function setRemovedGroceryItems(year: number, week: number, items: string[]): void {
+  localStorage.setItem(groceryRemovedKey(year, week), JSON.stringify(items))
+}
