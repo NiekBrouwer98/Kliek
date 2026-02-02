@@ -13,8 +13,6 @@ import {
 import { useData } from '../contexts/DataContext'
 import type { Recipe, WeekMenuSlot } from '../types/recipe'
 import RecipeCardDraggable from '../components/RecipeCardDraggable'
-import { GROCERY_CATEGORY_ORDER, sortIngredientsByCategory } from '../lib/groceryCategories'
-import { getRemovedGroceryItems, setRemovedGroceryItems } from '../lib/storage'
 
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -95,7 +93,6 @@ export default function WeekMenu() {
   const { recipes, getWeekMenu, saveWeekMenu } = useData()
   const [slots, setSlots] = useState<WeekMenuSlot[]>([])
   const [menuLoading, setMenuLoading] = useState(true)
-  const [removedGroceries, setRemovedGroceries] = useState<string[]>([])
 
   const filteredRecipes = useMemo(() => {
     const q = searchQuery.trim().toLowerCase()
@@ -120,10 +117,6 @@ export default function WeekMenu() {
     })
     return () => { cancelled = true }
   }, [year, week, getWeekMenu])
-
-  useEffect(() => {
-    setRemovedGroceries(getRemovedGroceryItems(year, week))
-  }, [year, week])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -169,37 +162,6 @@ export default function WeekMenu() {
     firstMonday.setDate(d.getDate() + diff + (week - 1) * 7)
     return firstMonday
   }, [year, week])
-
-  const groceryListByCategory = useMemo(() => {
-    const recipeIds = new Set(slots.map((s) => s.recipeId).filter(Boolean) as string[])
-    const allIngredients: string[] = []
-    recipeIds.forEach((id) => {
-      const recipe = getRecipe(id)
-      if (recipe?.ingredients?.length) allIngredients.push(...recipe.ingredients)
-    })
-    const unique = Array.from(new Set(allIngredients))
-    const visible = unique.filter((ing) => !removedGroceries.includes(ing))
-    return sortIngredientsByCategory(visible)
-  }, [slots, getRecipe, removedGroceries])
-
-  const removeFromGroceryList = (ingredient: string) => {
-    const next = [...removedGroceries, ingredient]
-    setRemovedGroceries(next)
-    setRemovedGroceryItems(year, week, next)
-  }
-
-  const restoreGroceryItem = (ingredient: string) => {
-    const next = removedGroceries.filter((i) => i !== ingredient)
-    setRemovedGroceries(next)
-    setRemovedGroceryItems(year, week, next)
-  }
-
-  const hasAnyGroceries = useMemo(() => {
-    for (const list of groceryListByCategory.values()) {
-      if (list.length > 0) return true
-    }
-    return false
-  }, [groceryListByCategory])
 
   return (
     <div className="space-y-8">
@@ -271,72 +233,6 @@ export default function WeekMenu() {
               ))}
             </tbody>
           </table>
-        </div>
-
-        <div className="mt-10">
-          <h2 className="font-recipe text-lg font-semibold text-ink mb-4">Grocery list</h2>
-          <p className="text-ink-muted text-sm mb-4">
-            Ingredients from this week&apos;s recipes, grouped by category. Remove items you already have.
-          </p>
-          {hasAnyGroceries ? (
-            <div className="space-y-6">
-              {GROCERY_CATEGORY_ORDER.map((category) => {
-                const items = groceryListByCategory.get(category) ?? []
-                if (items.length === 0) return null
-                return (
-                  <div key={category}>
-                    <h3 className="font-medium text-ink mb-2 text-sm uppercase tracking-wide text-olive">
-                      {category}
-                    </h3>
-                    <ul className="bg-white/80 rounded-xl border border-border divide-y divide-border overflow-hidden">
-                      {items.map((ingredient) => (
-                        <li
-                          key={ingredient}
-                          className="flex items-center justify-between gap-2 px-4 py-2.5 group"
-                        >
-                          <span className="text-ink">{ingredient}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeFromGroceryList(ingredient)}
-                            className="flex-shrink-0 p-1.5 rounded-lg text-ink-muted hover:bg-cream-2 hover:text-terracotta transition-colors"
-                            aria-label={`Remove ${ingredient} from list`}
-                            title="Remove from list"
-                          >
-                            ×
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <p className="text-ink-muted py-4">
-              Add recipes to the week grid above to generate a grocery list.
-            </p>
-          )}
-          {removedGroceries.length > 0 && (
-            <details className="mt-6">
-              <summary className="cursor-pointer text-sm text-olive hover:text-sage font-medium">
-                Show removed items ({removedGroceries.length})
-              </summary>
-              <ul className="mt-2 space-y-1 text-sm text-ink-muted">
-                {removedGroceries.map((ingredient) => (
-                  <li key={ingredient} className="flex items-center justify-between gap-2">
-                    <span className="line-through">{ingredient}</span>
-                    <button
-                      type="button"
-                      onClick={() => restoreGroceryItem(ingredient)}
-                      className="text-olive hover:text-sage font-medium"
-                    >
-                      Restore
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          )}
         </div>
 
         <div className="mt-10">

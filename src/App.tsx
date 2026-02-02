@@ -7,6 +7,7 @@ import RecipeDetail from './pages/RecipeDetail'
 import AddRecipe from './pages/AddRecipe'
 import ImportRecipe from './pages/ImportRecipe'
 import WeekMenu from './pages/WeekMenu'
+import GroceryList from './pages/GroceryList'
 import Login from './pages/Login'
 
 function App() {
@@ -53,6 +54,14 @@ function App() {
             >
               Week menu
             </NavLink>
+            <NavLink
+              to="/grocery-list"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${isActive ? 'bg-sage text-white' : 'text-ink-muted hover:text-olive hover:bg-sage/10'}`
+              }
+            >
+              Grocery list
+            </NavLink>
             {user ? (
               <span className="flex items-center gap-2 ml-2 pl-2 border-l border-border">
                 <span className="text-ink-muted text-sm truncate max-w-[120px]" title={user.email}>
@@ -87,6 +96,7 @@ function App() {
           <Route path="/add" element={<AddRecipe />} />
           <Route path="/import" element={<ImportRecipe />} />
           <Route path="/week-menu" element={<WeekMenu />} />
+          <Route path="/grocery-list" element={<GroceryList />} />
           <Route path="/login" element={<Login />} />
         </Routes>
       </main>
