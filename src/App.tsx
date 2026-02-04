@@ -16,8 +16,8 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-cream">
-      <header className="bg-cream-2 border-b border-border sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+      <header className="bg-cream-2 border-b border-border sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
+        <div className="max-w-5xl mx-auto px-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] py-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
           <NavLink to="/" className="font-recipe text-xl font-semibold text-ink tracking-tight hover:text-olive transition-colors">
             Kliek
           </NavLink>
@@ -88,7 +88,7 @@ function App() {
           </nav>
         </div>
       </header>
-      <main className="flex-1 max-w-5xl w-full mx-auto px-5 py-10 sm:py-12">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] pt-10 sm:pt-12 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
         <ImportFromDeviceBanner />
         <Routes>
           <Route path="/" element={<RecipeList />} />

@@ -205,6 +205,22 @@ function showStatus(el, type, message) {
   el.classList.remove('hidden');
 }
 
+function isInstagramUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '');
+    return host === 'instagram.com';
+  } catch (_) {
+    return false;
+  }
+}
+
+function openKliekWithUrl(tabUrl) {
+  const appUrl = getAppUrl();
+  const importUrl = appUrl + '/import?url=' + encodeURIComponent(tabUrl);
+  return chrome.tabs.create({ url: importUrl });
+}
+
 document.getElementById('send').addEventListener('click', async function () {
   const btn = document.getElementById('send');
   const status = document.getElementById('status');
@@ -213,8 +229,18 @@ document.getElementById('send').addEventListener('click', async function () {
 
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab || !tab.id) {
+    if (!tab || !tab.id || !tab.url) {
       showStatus(status, 'error', 'No active tab.');
+      btn.disabled = false;
+      return;
+    }
+
+    const tabUrl = tab.url;
+    const onInstagram = isInstagramUrl(tabUrl);
+
+    if (onInstagram) {
+      showStatus(status, 'success', 'Opening Kliek to import from this link…');
+      await openKliekWithUrl(tabUrl);
       btn.disabled = false;
       return;
     }
@@ -226,12 +252,14 @@ document.getElementById('send').addEventListener('click', async function () {
 
     const recipe = results && results[0] && results[0].result;
     if (!recipe) {
-      showStatus(status, 'error', 'Could not get recipe from this page.');
+      showStatus(status, 'success', 'Opening Kliek to import from this link…');
+      await openKliekWithUrl(tabUrl);
       btn.disabled = false;
       return;
     }
     if (recipe.error) {
-      showStatus(status, 'error', recipe.error);
+      showStatus(status, 'success', 'Opening Kliek to import from this link…');
+      await openKliekWithUrl(tabUrl);
       btn.disabled = false;
       return;
     }

@@ -58,7 +58,7 @@ export function parsePastedText(raw: string, defaultTitle = 'Imported recipe'): 
 
   let title = defaultTitle
   const firstLine = lines[0]
-  if (firstLine.length < 80 && !firstLine.match(/^\d/)) title = firstLine
+  if (firstLine.length <= 60 && !firstLine.match(/^\d/) && !firstLine.endsWith('...')) title = firstLine
 
   const ingIdx = findSection(lines, INGREDIENT_SECTION_MARKERS)
   const instrIdx = findSection(lines, INSTRUCTION_SECTION_MARKERS)

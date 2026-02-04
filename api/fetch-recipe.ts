@@ -46,6 +46,69 @@ interface ParsedRecipe {
   cookTimeMinutes?: number
 }
 
+/** Parse Instagram (or similar) caption into title, ingredients, instructions. */
+function parseCaptionAsRecipe(caption: string, defaultTitle = 'Instagram recipe'): ParsedRecipe | null {
+  const raw = caption.replace(/\r\n/g, '\n').trim()
+  if (!raw || raw.length < 20) return null
+  // Split on newlines first; if single long line, also split on common caption separators
+  let lines = raw.split(/\n+/).map((l) => l.trim()).filter(Boolean)
+  if (lines.length <= 1 && raw.length > 100) {
+    lines = raw
+      .split(/\s*[•·]\s*|\s*\.\s+(?=[A-Z])|(?=Ingredients?:)|(?=Instructions?:)|(?=Directions?:)|(?=Steps?:)/i)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 2)
+  }
+  if (lines.length === 0) return null
+
+  const INGREDIENT_MARKERS = ['ingredients', 'ingredienten', 'benodigdheden', 'what you need', 'you need']
+  const INSTRUCTION_MARKERS = ['instructions', 'directions', 'steps', 'method', 'bereiding', 'how to', 'preparation']
+  const findSection = (markers: string[]) => {
+    for (let i = 0; i < lines.length; i++) {
+      const lower = lines[i].toLowerCase()
+      if (lower.length < 60 && markers.some((m) => lower.includes(m))) return i
+    }
+    return -1
+  }
+  const isLikelyIngredient = (line: string) => {
+    const t = line.trim()
+    if (t.length < 2 || t.length > 200) return false
+    const hasQuantity = /^\d+[\s\/\d.]*/.test(t) || /^[-•*]\s*/.test(t) || /^\d+[.)]\s*/.test(t)
+    const hasUnit = /\b(tbsp|tsp|cup|g|kg|ml|oz|lb|clove|piece|pinch)\b/i.test(t)
+    return hasQuantity || hasUnit || (t.split(/\s+/).length <= 8 && !t.endsWith('.'))
+  }
+  const isLikelyInstruction = (line: string) => {
+    const t = line.trim()
+    if (t.length < 10) return false
+    return /^\d+[.)]\s*/.test(t) || /^(mix|add|heat|stir|bake|combine|place|cut|chop|serve)/i.test(t) || t.endsWith('.')
+  }
+
+  const ingIdx = findSection(INGREDIENT_MARKERS)
+  const instrIdx = findSection(INSTRUCTION_MARKERS)
+  let ingredientStart = ingIdx >= 0 ? ingIdx + 1 : 0
+  let ingredientEnd = instrIdx >= 0 ? instrIdx : lines.length
+  if (instrIdx >= 0 && ingIdx >= 0 && instrIdx < ingIdx) {
+    ingredientStart = 0
+    ingredientEnd = ingIdx
+  }
+  const instructionStart = instrIdx >= 0 ? instrIdx + 1 : ingIdx >= 0 ? ingredientEnd : 0
+
+  const ingredientLines = lines.slice(ingredientStart, ingredientEnd).filter((l) => isLikelyIngredient(l) || l.length < 120)
+  const instructionLines = lines.slice(instructionStart).filter((l) => isLikelyInstruction(l) || (l.length > 15 && l.length < 500))
+  const ingredients = ingredientLines.length > 0
+    ? ingredientLines.map((l) => l.replace(/^[-•*\d.)\s]+/, '').trim()).filter(Boolean)
+    : lines.slice(0, Math.min(20, lines.length)).filter(isLikelyIngredient).map((l) => l.replace(/^[-•*\d.)\s]+/, '').trim()).filter(Boolean)
+  const instructions = instructionLines.length > 0
+    ? instructionLines.map((l) => l.replace(/^\d+[.)]\s*/, '').replace(/^[-•*]\s*/, '').trim()).filter(Boolean)
+    : lines.filter((l) => !ingredients.includes(l) && l.length > 20).slice(0, 30).map((l) => l.replace(/^\d+[.)]\s*/, '').trim()).filter(Boolean)
+
+  let title = defaultTitle
+  const firstLine = lines[0]
+  if (firstLine.length <= 60 && !/^\d/.test(firstLine) && !firstLine.endsWith('...')) title = firstLine
+
+  if (ingredients.length === 0 && instructions.length === 0) return null
+  return { title, ingredients, instructions }
+}
+
 function findImageUrl($: cheerio.CheerioAPI): string {
   const og = $('meta[property="og:image"]').attr('content')
   if (og) return og
@@ -235,7 +298,23 @@ export async function GET(request: Request) {
     }
     const html = await res.text()
     const $ = cheerio.load(html)
-    const recipe = fromJsonLd($, targetUrl) || fromDom($, targetUrl)
+    const isInstagram = new URL(targetUrl).hostname.replace(/^www\./, '') === 'instagram.com'
+    let recipe: ParsedRecipe | null = null
+    if (isInstagram) {
+      const ogDesc = $('meta[property="og:description"]').attr('content')?.trim()
+      const ogImage = $('meta[property="og:image"]').attr('content') || findImageUrl($)
+      if (ogDesc && ogDesc.length > 30) {
+        const parsed = parseCaptionAsRecipe(ogDesc)
+        if (parsed) {
+          recipe = {
+            ...parsed,
+            sourceUrl: targetUrl,
+            imageUrl: ogImage || undefined,
+          }
+        }
+      }
+    }
+    if (!recipe) recipe = fromJsonLd($, targetUrl) || fromDom($, targetUrl)
     if (!recipe) {
       return new Response(
         JSON.stringify({ error: 'No recipe found on this page.' }),

@@ -120,13 +120,26 @@ export default function ImportRecipe() {
   )
 
   useEffect(() => {
-    const sharedUrl = searchParams.get('url')
-    if (!sharedUrl || !sharedUrl.startsWith('http')) return
-    setSearchParams({}, { replace: true })
-    setTab('url')
-    setUrl(sharedUrl)
-    void fetchRecipeFromUrl(sharedUrl)
-    // Only run when landing with a shared URL (e.g. from Share sheet on iPhone)
+    const sharedUrl = searchParams.get('url') || searchParams.get('text')?.trim()
+    const sharedText = searchParams.get('text')?.trim()
+    const sharedTitle = searchParams.get('title')?.trim()
+    const looksLikeUrl = sharedUrl && sharedUrl.startsWith('http')
+    if (looksLikeUrl) {
+      setSearchParams({}, { replace: true })
+      setTab('url')
+      setUrl(sharedUrl)
+      void fetchRecipeFromUrl(sharedUrl)
+      return
+    }
+    if (sharedText && sharedText.length > 20 && !sharedText.startsWith('http')) {
+      setSearchParams({}, { replace: true })
+      setTab('paste')
+      setPasteText(sharedText)
+      if (sharedText.toLowerCase().includes('instagram') || sharedTitle?.toLowerCase().includes('instagram')) {
+        setSource('instagram')
+      }
+    }
+    // Only run when landing with shared content (Share sheet, extension, etc.)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -178,6 +191,22 @@ export default function ImportRecipe() {
     }
     await fetchRecipeFromUrl(u)
   }
+
+  const handlePasteAndImport = useCallback(async () => {
+    setError(null)
+    try {
+      const text = await navigator.clipboard.readText()
+      const trimmed = (text || '').trim()
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        setUrl(trimmed)
+        await fetchRecipeFromUrl(trimmed)
+      } else {
+        setError('No recipe link in clipboard. Copy the link from Instagram (or another app) first, then tap Paste and import.')
+      }
+    } catch {
+      setError('Could not read clipboard. Paste the link in the field above and tap Fetch and import.')
+    }
+  }, [fetchRecipeFromUrl])
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -264,20 +293,32 @@ export default function ImportRecipe() {
 
       {tab === 'url' && (
         <form onSubmit={handleUrlSubmit} className="space-y-5">
-          <div className="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-sm">
-            <label className="block text-sm font-medium text-ink mb-2">Recipe page URL</label>
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-border bg-white text-ink placeholder:text-ink-muted focus:border-sage focus:ring-2 focus:ring-sage/20"
-              placeholder="https://..."
-            />
-            <p className="mt-2 text-sm text-ink-muted">
-              Paste a link to a recipe page (website, Instagram, Albert Heijn, etc.). We’ll fetch and import it.
-            </p>
-            <p className="mt-2 text-sm text-olive italic">
-              On iPhone: Kliek doesn’t appear in the Share menu (iOS doesn’t support it). Copy the recipe link from Instagram or Safari, open Kliek, then paste the link here and tap Fetch and import.
+          <div className="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-sm space-y-4">
+            <div>
+              <button
+                type="button"
+                onClick={handlePasteAndImport}
+                disabled={loading}
+                className="w-full px-5 py-4 rounded-xl bg-sage text-white font-medium hover:bg-sage-dark focus:ring-2 focus:ring-sage/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              >
+                {loading ? 'Importing…' : 'Paste and import'}
+              </button>
+              <p className="mt-2 text-sm text-ink-muted text-center">
+                Copy a recipe link (e.g. from Instagram), open Kliek, then tap once to import.
+              </p>
+            </div>
+            <div className="border-t border-border pt-4">
+              <label className="block text-sm font-medium text-ink mb-2">Or enter URL manually</label>
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-border bg-white text-ink placeholder:text-ink-muted focus:border-sage focus:ring-2 focus:ring-sage/20"
+                placeholder="https://..."
+              />
+            </div>
+            <p className="text-sm text-olive italic">
+              <strong>iPhone – Instagram:</strong> Add Kliek to your Home Screen (in Safari: Share → Add to Home Screen). Then when viewing a recipe post, tap Share and choose &quot;Kliek&quot; to import in one tap. Or copy the post link, open Kliek, tap &quot;Paste and import&quot; above.
             </p>
           </div>
           <button
