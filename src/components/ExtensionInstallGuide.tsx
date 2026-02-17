@@ -1,12 +1,11 @@
 import { useEffect } from 'react'
 
 const EXTENSION_GITHUB_URL = 'https://github.com/NiekBrouwer98/Kliek/tree/master/extension'
-const REPO_ZIP_URL = 'https://github.com/NiekBrouwer98/Kliek/archive/refs/heads/master.zip'
 
 const STEPS = [
   { n: 1, title: 'Open Chrome Extensions', text: 'In Chrome, go to chrome://extensions (or Menu → More tools → Extensions).' },
   { n: 2, title: 'Enable Developer mode', text: 'Turn on the "Developer mode" toggle in the top-right corner.' },
-  { n: 3, title: 'Load the extension', text: 'Click "Load unpacked" and select the extension folder (the one that contains manifest.json). If you downloaded the ZIP below, extract it first and choose the extension folder inside the extracted folder.' },
+  { n: 3, title: 'Load the extension', text: 'Click "Load unpacked" and select the extension folder (the one that contains manifest.json). If you downloaded the ZIP below, extract it first—the ZIP contains only the extension folder.' },
   { n: 4, title: 'Use it', text: 'Open any recipe page (or Instagram post), click the Kliek extension icon in the toolbar, then "Send recipe to Kliek". The recipe will open in this app.' },
 ]
 
@@ -58,9 +57,8 @@ export default function ExtensionInstallGuide({ onClose }: ExtensionInstallGuide
           </p>
           <div className="flex flex-col sm:flex-row gap-2 mb-6">
             <a
-              href={REPO_ZIP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/api/download-extension"
+              download="kliek-extension.zip"
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-olive text-white font-medium hover:bg-olive-dark transition-colors text-sm"
             >
               Download extension (ZIP)
@@ -88,7 +86,7 @@ export default function ExtensionInstallGuide({ onClose }: ExtensionInstallGuide
             ))}
           </ol>
           <p className="mt-6 text-sm text-ink-muted">
-            The ZIP contains the full Kliek repo; use the <code className="bg-cream-2 px-1.5 py-0.5 rounded">extension</code> folder when loading unpacked. After loading it once, the extension stays installed until you remove it.
+            The ZIP contains only the <code className="bg-cream-2 px-1.5 py-0.5 rounded">extension</code> folder. Extract it and select that folder in Chrome. After loading it once, the extension stays installed until you remove it.
           </p>
           <button
             type="button"
