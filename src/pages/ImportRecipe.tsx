@@ -215,8 +215,9 @@ export default function ImportRecipe() {
         Paste text from a website, Instagram, or Albert Heijn; or upload a PDF. All recipes are normalized to the same format.
       </p>
 
-      <div className="flex gap-2 border-b border-border mb-8">
-        {(['paste', 'pdf', 'url'] as const).map((t) => (
+      <div className="flex flex-wrap items-center gap-2 border-b border-border mb-8">
+        <div className="flex gap-2">
+          {(['paste', 'pdf', 'url'] as const).map((t) => (
           <button
             key={t}
             type="button"
@@ -228,6 +229,13 @@ export default function ImportRecipe() {
             {t === 'url' ? 'Website URL' : t}
           </button>
         ))}
+        </div>
+        <a
+          href="#extension"
+          className="ml-auto text-sm text-olive hover:text-sage font-medium"
+        >
+          Install Chrome extension
+        </a>
       </div>
 
       {error && (

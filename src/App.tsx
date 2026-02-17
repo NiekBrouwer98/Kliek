@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import { Routes, Route, NavLink } from 'react-router-dom'
 import { usePendingExtensionImport } from './hooks/usePendingExtensionImport'
 import { useAuth } from './contexts/AuthContext'
 import ImportFromDeviceBanner from './components/ImportFromDeviceBanner'
+import ExtensionInstallGuide from './components/ExtensionInstallGuide'
 import RecipeList from './pages/RecipeList'
 import RecipeDetail from './pages/RecipeDetail'
 import AddRecipe from './pages/AddRecipe'
@@ -13,6 +15,22 @@ import Login from './pages/Login'
 function App() {
   usePendingExtensionImport()
   const { user, signOut } = useAuth()
+  const [extensionGuideOpen, setExtensionGuideOpen] = useState(false)
+
+  useEffect(() => {
+    if (window.location.hash === '#extension') {
+      setExtensionGuideOpen(true)
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
+    const onHashChange = () => {
+      if (window.location.hash === '#extension') {
+        setExtensionGuideOpen(true)
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col bg-cream">
@@ -62,6 +80,13 @@ function App() {
             >
               Grocery list
             </NavLink>
+            <button
+              type="button"
+              onClick={() => setExtensionGuideOpen(true)}
+              className="px-3 py-2 rounded-xl text-sm font-medium text-ink-muted hover:text-olive hover:bg-sage/10 transition-colors"
+            >
+              Chrome extension
+            </button>
             {user ? (
               <span className="flex items-center gap-2 ml-2 pl-2 border-l border-border">
                 <span className="text-ink-muted text-sm truncate max-w-[120px]" title={user.email}>
@@ -88,6 +113,9 @@ function App() {
           </nav>
         </div>
       </header>
+      {extensionGuideOpen && (
+        <ExtensionInstallGuide onClose={() => setExtensionGuideOpen(false)} />
+      )}
       <main className="flex-1 max-w-5xl w-full mx-auto px-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] pt-10 sm:pt-12 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
         <ImportFromDeviceBanner />
         <Routes>
